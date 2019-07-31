@@ -2,7 +2,7 @@
   "name": "bleutest",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "/public/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "postcss css/tailwind.css -o public/build/tailwind.css"
