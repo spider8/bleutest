@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/vue@2.6.10/dist/vue.js"></script>
+    <link rel="stylesheet" href="./build/tailwind.css">
+    <title>Bleutest</title>
+</head>
+
+<body class="h-screen">
+    <header class="w-full h-24 bg-bleu flex justify-around items-center">
+        <h1 class="font-extrabold text-white text-5xl">Bleutest</h1>
+        <div class="flex items-baseline -ml-3">
+            <a href="#" class="border-none bg-transparent text-white mx-5">Bleutest BUY</a>
+            <a href="#" class="border-b-2 border-white bg-transparent text-white mx-5 pb-2">Compare</a>
+            <a href="#" class="border-none bg-transparent text-white mx-5">Remittance</a>
+            <a href="#" class="border-none bg-transparent text-white mx-5">Exchanges</a>
+            <a href="#" class="border-none bg-transparent text-white mx-5">Exchanges'Fees</a>
+            <a href="#"
+                class="border-solid border-white border-2 py-1 px-3 rounded-lg font-bold bg-transparent text-white mx-4">
+                Login</a>
+            <div class="pl-4 flex items-center">
+                <img src="./resources/brasil-flag.png" alt="Bandeira do Brasil"
+                    class="border-solid border-white border-2 h-5 w-8">
+                <p class="text-white pl-2">BRL</p>
+            </div>
+        </div>
+    </header>
+    <main id="app" class="w-full mt-24 flex flex-col">
+        <h1 class="text-blue-900 text-center text-5xl text-bleu-dark">USD Best Price in Brazil</h1>
+        <p class="text-center text-gray-700 leading-loose text-xl mt-6">Compare and find in realtime the best prices in
+            Brazil's top USD exchanges, considering fees.</p>
+        <p class="text-center text-gray-700 leading-loose text-xl">
+            <span class="bg-brow rounded-lg px-3 py-1 border-solid border-2 border-brow-lighter">Click on the exchange
+                row</span> to view operation detail.</p>
+
+        <div class="flex mt-10 mx-auto">
+            <div class="border-solid border-2 flex rounded-lg mr-6 border-brow-lighter w-64">
+                <input type="number" class="w-3/5 focus:outline-none text-3xl text-brow-dark text-right bg-transparent"
+                    :value="brlValue" @keyup="calcBRL">
+                <p class="border-l-2 w-2/5 text-3xl font-bold text-center mx-4 my-2 p-2 text-bleu-dark">
+                    BRL</p>
+            </div>
+            <div class="border-solid border-2 flex rounded-lg mr-6 border-brow-lighter w-64">
+                <input type="number" class="w-3/5 focus:outline-none text-3xl text-brow-dark text-right bg-transparent"
+                    :value="usdValue" @keyup="calcUSD">
+                <p class="border-l-2 w-2/5 text-3xl font-bold text-center mx-4 my-2 p-2 text-brow-dark">USD</p>
+            </div>
+        </div>
+    </main>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                bid: 1,
+
+                brlValue: 1,
+                brlSelected: true,
+
+                usdValue: 1,
+                currentValue: 1
+            },
+            methods: {
+                calcBRL: function (e) {
+                    this.brlSelected = true;
+                    this.currentValue = parseFloat(e.target.value);
+                    this.calculate();
+                },
+                calcUSD: function (e) {
+                    this.brlSelected = false;
+                    this.currentValue = parseFloat(e.target.value);
+                    this.calculate();
+                },
+                calculate: function () {
+                    const value = this.currentValue;
+                    if (isNaN(value)) {
+                        this.brlValue = "";
+                        this.usdValue = "";
+                        return;
+                    }
+
+                    if (this.brlSelected) {
+                        this.brlValue = value;
+                        this.usdValue = (value * this.bid).toFixed(2);
+                    } else {
+                        this.usdValue = value;
+                        this.brlValue = (value / this.bid).toFixed(2);
+                    }
+                }
+            },
+            mounted() {
+                fetch("https://economia.awesomeapi.com.br/all/USD-BRL")
+                    .then(response => response.json())
+                    .then(data => {
+                        this.bid = parseFloat(data.USD.bid.replace(",", "."));
+                        // Render values with 1 real
+                        this.currentValue = 1;
+                        this.calculate();
+                    })
+            }
+        })
+    </script>
+</body>
+
+</html>
